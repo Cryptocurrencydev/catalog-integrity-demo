@@ -1,0 +1,4 @@
+supabase/.temp
+admin/node_modules
+admin/.env.local
+admin/e2e/screens
