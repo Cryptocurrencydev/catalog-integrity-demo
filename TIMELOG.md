@@ -14,3 +14,8 @@ Wall-clock timestamps per phase (WAT, UTC+1). Each phase ends when its checks pa
 | 6. Scale: 50k seed + EXPLAIN before/after | 11:29 | 11:36 | 50,301 products / 1.16M list rows seeded in 59 s; found RLS-blocks-index-use on search, fixed with definer search RPCs + per-role policies |
 | 7. Hosted project: link, migrations, 5k seed, edge function deploy | 11:36 | 11:40 | user-created "catalog integrity" (eu-west-3); fixtures embedded in the bundle after the API deploy dropped static files |
 | 8. Admin UI (React + Vite + TS) | 11:37 | 11:47 | queue / drafts with diff / quality / audit / ingest tabs; Playwright smoke at 1280px + 390px green |
+| 9. CI, README, gitleaks, GitHub + Vercel deploy, live verification | 11:47 | 11:55 | CI 4/4 green on first full run; live UI smoke (desktop + 390px) and live ingest verified |
+
+**Total: 10:47 → 11:55** (≈68 min wall clock).
+
+Results: 167 pgTAP + 54 Deno unit + 12 edge-function e2e + 5 UI unit tests + 14-check Playwright smoke. 50k bench in bench/RESULTS.md.
