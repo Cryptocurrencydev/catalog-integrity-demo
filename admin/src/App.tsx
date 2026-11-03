@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import type { Session } from "@supabase/supabase-js";
+import { Analytics } from "@vercel/analytics/react";
 import { DEMO_EMAIL, DEMO_PASSWORD } from "./config";
 import { supabase } from "./supabase";
 import { explainError, ToastProvider } from "./ui";
@@ -133,6 +134,7 @@ export default function App() {
         </main>
         <Footer />
       </div>
+      <Analytics />
     </ToastProvider>
   );
 }
