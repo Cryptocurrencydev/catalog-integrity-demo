@@ -1,0 +1,94 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  SUPABASE_CLI_VERSION: 2.122.0
+  DENO_VERSION: v2.x
+
+jobs:
+  secret-scan:
+    name: Secret scan (gitleaks, full history)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: gitleaks
+        run: |
+          curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz | tar xz gitleaks
+          ./gitleaks git --redact --verbose --exit-code 1 .
+
+  pipeline:
+    name: Pipeline (Deno fmt, lint, typecheck, unit tests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: ${{ env.DENO_VERSION }}
+      - run: deno fmt --check
+      - run: deno lint
+      - run: deno task check
+      - run: deno task test:unit
+
+  database:
+    name: Database (migrations from scratch, plpgsql lint, pgTAP, edge function e2e)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: ${{ env.SUPABASE_CLI_VERSION }}
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: ${{ env.DENO_VERSION }}
+      - name: Start local Supabase (db, auth, rest, kong, edge runtime)
+        run: supabase start -x studio,imgproxy,mailpit,logflare,vector,realtime,supavisor,postgres-meta,storage-api
+      - name: Apply all migrations from scratch + seed
+        run: supabase db reset
+      - name: Lint database functions (plpgsql_check)
+        run: supabase db lint -s public,private --level error --fail-on error
+      - name: pgTAP
+        run: supabase test db
+      - name: Edge function end-to-end (fixtures -> catalog / queue / drafts / dead letter)
+        run: |
+          set -a
+          eval "$(supabase status -o env)"
+          set +a
+          deno task test:integration
+      - name: Scale smoke (5k products, repair RPC + hot queries stay indexed)
+        run: |
+          scripts/seed-scale.sh 5000 postgresql://postgres:postgres@127.0.0.1:56322/postgres
+          python3 scripts/bench.py postgresql://postgres:postgres@127.0.0.1:56322/postgres
+      - name: Stop Supabase
+        if: always()
+        run: supabase stop --no-backup
+
+  admin-ui:
+    name: Admin UI (typecheck, unit tests, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: admin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: admin/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run build

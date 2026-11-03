@@ -1,0 +1,12 @@
+Gather  (cost=1000.00..11145.95 rows=1 width=80) (actual time=8.077..9.334 rows=1 loops=1)
+  Workers Planned: 2
+  Workers Launched: 2
+  Buffers: shared hit=3995 read=4123
+  ->  Parallel Seq Scan on analysis_cache  (cost=0.00..10145.85 rows=1 width=80) (actual time=6.567..6.568 rows=0 loops=3)
+        Filter: ((invalidated_at IS NULL) AND (NOT quarantined) AND (product_id = 50300) AND (analysis_kind = 'safety_narrative'::text) AND (provider = 'google'::text) AND (input_hash = '9912335270602f938628aafb564c9171'::text))
+        Rows Removed by Filter: 81114
+        Buffers: shared hit=3995 read=4123
+Planning:
+  Buffers: shared hit=126
+Planning Time: 0.193 ms
+Execution Time: 9.347 ms

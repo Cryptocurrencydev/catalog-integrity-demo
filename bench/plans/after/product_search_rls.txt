@@ -1,0 +1,22 @@
+Limit  (cost=3928.45..3928.46 rows=2 width=45) (actual time=24.645..24.647 rows=20 loops=1)
+  Buffers: shared hit=3175
+  ->  Sort  (cost=3928.45..3928.46 rows=2 width=45) (actual time=24.645..24.646 rows=20 loops=1)
+        Sort Key: p.id DESC
+        Sort Method: quicksort  Memory: 28kB
+        Buffers: shared hit=3175
+        ->  Nested Loop  (cost=0.00..3928.44 rows=2 width=45) (actual time=24.528..24.629 rows=36 loops=1)
+              Join Filter: (b.id = p.brand_id)
+              Rows Removed by Join Filter: 1692
+              Buffers: shared hit=3172
+              ->  Seq Scan on brands b  (cost=0.00..1.48 rows=48 width=18) (actual time=0.002..0.004 rows=48 loops=1)
+                    Buffers: shared hit=1
+              ->  Materialize  (cost=0.00..3925.53 rows=2 width=43) (actual time=0.055..0.512 rows=36 loops=48)
+                    Buffers: shared hit=3171
+                    ->  Seq Scan on products p  (cost=0.00..3925.51 rows=2 width=43) (actual time=2.622..24.508 rows=36 loops=1)
+                          Filter: ((status = 'published'::product_status) AND (name_key ~~* '%radiance retinol night%'::text))
+                          Rows Removed by Filter: 50265
+                          Buffers: shared hit=3171
+Planning:
+  Buffers: shared hit=313
+Planning Time: 0.382 ms
+Execution Time: 24.664 ms

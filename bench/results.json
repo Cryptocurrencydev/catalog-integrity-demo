@@ -1,0 +1,49 @@
+{
+  "dataset": {
+    "products": 50301,
+    "product_ingredients": 1162167,
+    "ingredients": 1758,
+    "aliases": 426,
+    "analysis_cache": 243342,
+    "queue_pending": 2042,
+    "queue_total": 20105,
+    "audit_log": 16609
+  },
+  "params": {
+    "pid": "50300",
+    "hash": "d84e0fe99bd7d862927addfc0ed850f5",
+    "provider": "google",
+    "model": "gemini-2.5-flash",
+    "term": "niacin",
+    "product_term": "radiance retinol night"
+  },
+  "runs_per_query": 7,
+  "before_ms": {
+    "product_page": 17.061,
+    "ingredient_search_rls": 14.62,
+    "ingredient_search": 5.296,
+    "ingredient_search_body": 3.274,
+    "product_search_rls": 24.3,
+    "product_search": 25.031,
+    "cache_lookup": 9.347,
+    "queue_listing": 9.999,
+    "drafts_listing": 1.28,
+    "audit_for_product": 2.057,
+    "repair_rpc": 37.415,
+    "quality_report": 384.628
+  },
+  "after_ms": {
+    "product_page": 0.358,
+    "ingredient_search_rls": 14.76,
+    "ingredient_search": 2.395,
+    "ingredient_search_body": 3.276,
+    "product_search_rls": 24.664,
+    "product_search": 2.435,
+    "cache_lookup": 0.026,
+    "queue_listing": 0.619,
+    "drafts_listing": 0.507,
+    "audit_for_product": 0.255,
+    "repair_rpc": 6.105,
+    "quality_report": 299.308
+  }
+}

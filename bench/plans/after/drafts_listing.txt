@@ -1,0 +1,20 @@
+Limit  (cost=1.08..831.19 rows=50 width=102) (actual time=0.227..0.507 rows=50 loops=1)
+  Buffers: shared hit=291
+  InitPlan 1
+    ->  Result  (cost=0.00..0.26 rows=1 width=1) (actual time=0.207..0.207 rows=1 loops=1)
+          Buffers: shared hit=98
+  InitPlan 2
+    ->  Result  (cost=0.00..0.26 rows=1 width=1) (never executed)
+  ->  Nested Loop  (cost=0.56..1826.79 rows=110 width=102) (actual time=0.226..0.504 rows=50 loops=1)
+        Buffers: shared hit=291
+        ->  Index Scan using repair_drafts_pending on repair_drafts d  (cost=0.27..619.64 rows=165 width=83) (actual time=0.215..0.271 rows=50 loops=1)
+              Filter: (InitPlan 1).col1
+              Buffers: shared hit=141
+        ->  Index Scan using products_pkey on products p  (cost=0.29..7.32 rows=1 width=35) (actual time=0.004..0.004 rows=1 loops=50)
+              Index Cond: (id = d.product_id)
+              Filter: ((status = 'published'::product_status) OR (InitPlan 2).col1)
+              Buffers: shared hit=150
+Planning:
+  Buffers: shared hit=365
+Planning Time: 0.476 ms
+Execution Time: 0.532 ms

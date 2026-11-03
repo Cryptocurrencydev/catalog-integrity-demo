@@ -1,0 +1,29 @@
+{
+  "imports": {
+    "@std/assert": "jsr:@std/assert@1.0.13"
+  },
+  "tasks": {
+    "test:unit": "deno test --allow-read tests/unit",
+    "test:integration": "deno test --allow-env --allow-net --allow-read tests/integration",
+    "check": "deno check supabase/functions/*/index.ts supabase/functions/_shared/*.ts"
+  },
+  "fmt": {
+    "lineWidth": 120,
+    "include": [
+      "supabase/functions",
+      "tests"
+    ]
+  },
+  "lint": {
+    "include": [
+      "supabase/functions",
+      "tests"
+    ],
+    "rules": {
+      "exclude": [
+        "no-import-prefix",
+        "no-explicit-any"
+      ]
+    }
+  }
+}

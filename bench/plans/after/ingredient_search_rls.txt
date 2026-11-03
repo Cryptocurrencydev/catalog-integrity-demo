@@ -1,0 +1,55 @@
+Nested Loop  (cost=65.44..21116.78 rows=5 width=57) (actual time=13.893..13.895 rows=1 loops=1)
+  Buffers: shared hit=3275
+  ->  Limit  (cost=65.17..65.18 rows=5 width=12) (actual time=3.065..3.066 rows=1 loops=1)
+        Buffers: shared hit=37
+        ->  Sort  (cost=65.17..65.22 rows=22 width=12) (actual time=3.064..3.066 rows=1 loops=1)
+              Sort Key: (max((similarity(ingredients.normalized_name, 'niacin'::text)))) DESC
+              Sort Method: quicksort  Memory: 25kB
+              Buffers: shared hit=37
+              ->  GroupAggregate  (cost=64.42..64.80 rows=22 width=12) (actual time=3.056..3.057 rows=1 loops=1)
+                    Group Key: ingredients.id
+                    Buffers: shared hit=34
+                    ->  Sort  (cost=64.42..64.47 rows=22 width=12) (actual time=3.053..3.053 rows=2 loops=1)
+                          Sort Key: ingredients.id
+                          Sort Method: quicksort  Memory: 25kB
+                          Buffers: shared hit=34
+                          ->  Append  (cost=0.00..63.92 rows=22 width=12) (actual time=0.167..3.046 rows=2 loops=1)
+                                Buffers: shared hit=31
+                                ->  Seq Scan on ingredients  (cost=0.00..51.41 rows=18 width=12) (actual time=0.166..2.318 rows=1 loops=1)
+                                      Filter: ((normalized_name ~~* '%niacin%'::text) OR (normalized_name % 'niacin'::text))
+                                      Rows Removed by Filter: 1757
+                                      Buffers: shared hit=25
+                                ->  Seq Scan on ingredient_aliases  (cost=0.00..12.40 rows=4 width=12) (actual time=0.094..0.728 rows=1 loops=1)
+                                      Filter: ((alias_normalized ~~* '%niacin%'::text) OR (alias_normalized % 'niacin'::text))
+                                      Rows Removed by Filter: 425
+                                      Buffers: shared hit=6
+  ->  Index Scan using ingredients_pkey on ingredients i  (cost=0.28..7.49 rows=1 width=29) (actual time=0.005..0.005 rows=1 loops=1)
+        Index Cond: (id = ingredients.id)
+        Buffers: shared hit=3
+  SubPlan 3
+    ->  Aggregate  (cost=4202.80..4202.81 rows=1 width=32) (actual time=10.820..10.821 rows=1 loops=1)
+          Buffers: shared hit=3235
+          ->  Subquery Scan on x  (cost=0.72..4202.75 rows=20 width=59) (actual time=10.776..10.796 rows=20 loops=1)
+                Buffers: shared hit=3235
+                ->  Limit  (cost=0.72..4202.55 rows=20 width=43) (actual time=10.771..10.789 rows=20 loops=1)
+                      Buffers: shared hit=3235
+                      ->  Nested Loop  (cost=0.72..10505.30 rows=50 width=43) (actual time=10.771..10.788 rows=20 loops=1)
+                            Buffers: shared hit=3235
+                            ->  Index Only Scan Backward using product_ingredients_ingredient_idx on product_ingredients pi  (cost=0.43..7583.74 rows=453 width=8) (actual time=10.760..10.764 rows=20 loops=1)
+                                  Index Cond: (ingredient_id = i.id)
+                                  Filter: (ANY (product_id = (hashed SubPlan 2).col1))
+                                  Heap Fetches: 0
+                                  Buffers: shared hit=3175
+                                  SubPlan 2
+                                    ->  Seq Scan on products p  (cost=0.00..3925.51 rows=5589 width=8) (actual time=0.002..6.387 rows=48856 loops=1)
+                                          Filter: ((status = 'published'::product_status) AND (status = 'published'::product_status))
+                                          Rows Removed by Filter: 1445
+                                          Buffers: shared hit=3171
+                            ->  Index Scan using products_pkey on products p_1  (cost=0.29..6.45 rows=1 width=35) (actual time=0.001..0.001 rows=1 loops=20)
+                                  Index Cond: (id = pi.product_id)
+                                  Filter: ((status = 'published'::product_status) AND (status = 'published'::product_status))
+                                  Buffers: shared hit=60
+Planning:
+  Buffers: shared hit=507
+Planning Time: 1.274 ms
+Execution Time: 14.018 ms

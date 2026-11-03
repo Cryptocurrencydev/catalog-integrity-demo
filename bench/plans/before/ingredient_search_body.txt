@@ -1,0 +1,49 @@
+Nested Loop  (cost=64.11..2168.18 rows=2 width=57) (actual time=4.071..4.073 rows=1 loops=1)
+  Buffers: shared hit=120
+  ->  Limit  (cost=63.83..63.84 rows=2 width=12) (actual time=3.910..3.912 rows=1 loops=1)
+        Buffers: shared hit=37
+        ->  Sort  (cost=63.83..63.84 rows=2 width=12) (actual time=3.909..3.910 rows=1 loops=1)
+              Sort Key: (max((similarity(i_1.normalized_name, 'niacin'::text)))) DESC
+              Sort Method: quicksort  Memory: 25kB
+              Buffers: shared hit=37
+              ->  GroupAggregate  (cost=63.78..63.82 rows=2 width=12) (actual time=3.899..3.900 rows=1 loops=1)
+                    Group Key: i_1.id
+                    Buffers: shared hit=34
+                    ->  Sort  (cost=63.78..63.79 rows=2 width=12) (actual time=3.894..3.895 rows=2 loops=1)
+                          Sort Key: i_1.id
+                          Sort Method: quicksort  Memory: 25kB
+                          Buffers: shared hit=34
+                          ->  Append  (cost=0.00..63.77 rows=2 width=12) (actual time=0.186..3.884 rows=2 loops=1)
+                                Buffers: shared hit=31
+                                ->  Seq Scan on ingredients i_1  (cost=0.00..51.37 rows=1 width=12) (actual time=0.185..2.896 rows=1 loops=1)
+                                      Filter: ((normalized_name ~~* '%niacin%'::text) OR (normalized_name % 'niacin'::text))
+                                      Rows Removed by Filter: 1757
+                                      Buffers: shared hit=25
+                                ->  Seq Scan on ingredient_aliases a  (cost=0.00..12.39 rows=1 width=12) (actual time=0.124..0.986 rows=1 loops=1)
+                                      Filter: ((alias_normalized ~~* '%niacin%'::text) OR (alias_normalized % 'niacin'::text))
+                                      Rows Removed by Filter: 425
+                                      Buffers: shared hit=6
+  ->  Index Scan using ingredients_pkey on ingredients i  (cost=0.28..8.29 rows=1 width=29) (actual time=0.010..0.010 rows=1 loops=1)
+        Index Cond: (id = i_1.id)
+        Buffers: shared hit=3
+  SubPlan 1
+    ->  Aggregate  (cost=1043.85..1043.86 rows=1 width=32) (actual time=0.146..0.146 rows=1 loops=1)
+          Buffers: shared hit=80
+          ->  Subquery Scan on x  (cost=0.72..1043.80 rows=20 width=59) (actual time=0.044..0.119 rows=20 loops=1)
+                Buffers: shared hit=80
+                ->  Limit  (cost=0.72..1043.60 rows=20 width=43) (actual time=0.039..0.111 rows=20 loops=1)
+                      Buffers: shared hit=80
+                      ->  Nested Loop  (cost=0.72..45522.51 rows=873 width=43) (actual time=0.038..0.109 rows=20 loops=1)
+                            Buffers: shared hit=80
+                            ->  Index Only Scan Backward using product_ingredients_pkey on product_ingredients pi  (cost=0.43..40128.13 rows=898 width=8) (actual time=0.026..0.069 rows=20 loops=1)
+                                  Index Cond: (ingredient_id = i.id)
+                                  Heap Fetches: 0
+                                  Buffers: shared hit=20
+                            ->  Index Scan using products_pkey on products p  (cost=0.29..6.01 rows=1 width=35) (actual time=0.002..0.002 rows=1 loops=20)
+                                  Index Cond: (id = pi.product_id)
+                                  Filter: (status = 'published'::product_status)
+                                  Buffers: shared hit=60
+Planning:
+  Buffers: shared hit=327
+Planning Time: 2.522 ms
+Execution Time: 4.165 ms

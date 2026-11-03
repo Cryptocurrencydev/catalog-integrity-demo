@@ -1,0 +1,49 @@
+Limit  (cost=4908.73..4908.86 rows=50 width=99) (actual time=9.951..9.956 rows=50 loops=1)
+  Buffers: shared hit=3910
+  InitPlan 1
+    ->  Result  (cost=0.00..0.26 rows=1 width=1) (actual time=0.171..0.171 rows=1 loops=1)
+          Buffers: shared hit=98
+  InitPlan 2
+    ->  Result  (cost=0.00..0.26 rows=1 width=1) (actual time=0.073..0.073 rows=1 loops=1)
+  ->  Sort  (cost=4908.21..4916.59 rows=3351 width=99) (actual time=9.951..9.953 rows=50 loops=1)
+        Sort Key: q.created_at, q.id
+        Sort Method: top-N heapsort  Memory: 37kB
+        Buffers: shared hit=3910
+        ->  Nested Loop Left Join  (cost=746.36..4796.90 rows=3351 width=99) (actual time=1.406..9.760 rows=2042 loops=1)
+              Buffers: shared hit=3904
+              ->  Hash Left Join  (cost=746.07..4703.50 rows=3351 width=86) (actual time=1.398..9.392 rows=2042 loops=1)
+                    Hash Cond: (p.brand_id = b.id)
+                    Buffers: shared hit=3820
+                    ->  Hash Right Join  (cost=743.99..4691.84 rows=3351 width=84) (actual time=1.390..9.222 rows=2042 loops=1)
+                          Hash Cond: (p.id = q.product_id)
+                          Buffers: shared hit=3819
+                          ->  Seq Scan on products p  (cost=0.00..3799.76 rows=33534 width=43) (actual time=0.003..5.885 rows=50301 loops=1)
+                                Filter: ((status = 'published'::product_status) OR (InitPlan 2).col1)
+                                Buffers: shared hit=3171
+                          ->  Hash  (cost=702.10..702.10 rows=3351 width=57) (actual time=1.375..1.375 rows=2042 loops=1)
+                                Buckets: 4096  Batches: 1  Memory Usage: 215kB
+                                Buffers: shared hit=648
+                                ->  Bitmap Heap Scan on verification_queue q  (cost=75.33..702.10 rows=3351 width=57) (actual time=0.298..1.224 rows=2042 loops=1)
+                                      Recheck Cond: (status = 'pending'::queue_status)
+                                      Filter: (InitPlan 1).col1
+                                      Heap Blocks: exact=535
+                                      Buffers: shared hit=648
+                                      ->  Bitmap Index Scan on verification_queue_open_dedupe  (cost=0.00..74.49 rows=6702 width=0) (actual time=0.096..0.096 rows=2042 loops=1)
+                                            Buffers: shared hit=15
+                    ->  Hash  (cost=1.48..1.48 rows=48 width=18) (actual time=0.006..0.006 rows=48 loops=1)
+                          Buckets: 1024  Batches: 1  Memory Usage: 11kB
+                          Buffers: shared hit=1
+                          ->  Seq Scan on brands b  (cost=0.00..1.48 rows=48 width=18) (actual time=0.001..0.003 rows=48 loops=1)
+                                Buffers: shared hit=1
+              ->  Memoize  (cost=0.29..0.34 rows=1 width=29) (actual time=0.000..0.000 rows=1 loops=2042)
+                    Cache Key: q.suggested_ingredient_id
+                    Cache Mode: logical
+                    Hits: 2014  Misses: 28  Evictions: 0  Overflows: 0  Memory Usage: 4kB
+                    Buffers: shared hit=84
+                    ->  Index Scan using ingredients_pkey on ingredients s  (cost=0.28..0.33 rows=1 width=29) (actual time=0.001..0.001 rows=1 loops=28)
+                          Index Cond: (id = q.suggested_ingredient_id)
+                          Buffers: shared hit=84
+Planning:
+  Buffers: shared hit=353
+Planning Time: 0.503 ms
+Execution Time: 9.999 ms

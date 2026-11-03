@@ -1,0 +1,52 @@
+Hash Join  (cost=8.32..2034280.50 rows=1 width=117) (actual time=16.987..16.996 rows=1 loops=1)
+  Hash Cond: (b.id = p.brand_id)
+  Buffers: shared hit=3526 read=4731
+  ->  Seq Scan on brands b  (cost=0.00..1.48 rows=48 width=18) (actual time=0.002..0.004 rows=48 loops=1)
+        Buffers: shared hit=1
+  ->  Hash  (cost=8.31..8.31 rows=1 width=51) (actual time=0.015..0.015 rows=1 loops=1)
+        Buckets: 1024  Batches: 1  Memory Usage: 9kB
+        Buffers: shared hit=6
+        ->  Index Scan using products_pkey on products p  (cost=0.29..8.31 rows=1 width=51) (actual time=0.012..0.012 rows=1 loops=1)
+              Index Cond: (id = 50300)
+              Filter: (status = 'published'::product_status)
+              Buffers: shared hit=6
+  SubPlan 3
+    ->  Aggregate  (cost=330.38..330.39 rows=1 width=32) (actual time=0.235..0.237 rows=1 loops=1)
+          Buffers: shared hit=126
+          ->  Sort  (cost=330.29..330.32 rows=12 width=28) (actual time=0.174..0.176 rows=29 loops=1)
+                Sort Key: pi."position"
+                Sort Method: quicksort  Memory: 26kB
+                Buffers: shared hit=119
+                ->  Hash Join  (cost=282.87..330.07 rows=12 width=28) (actual time=0.033..0.165 rows=29 loops=1)
+                      Hash Cond: (i.id = pi.ingredient_id)
+                      Buffers: shared hit=116
+                      ->  Seq Scan on ingredients i  (cost=0.00..42.58 rows=1758 width=30) (actual time=0.002..0.066 rows=1758 loops=1)
+                            Buffers: shared hit=25
+                      ->  Hash  (cost=282.72..282.72 rows=12 width=14) (actual time=0.027..0.028 rows=29 loops=1)
+                            Buckets: 1024  Batches: 1  Memory Usage: 10kB
+                            Buffers: shared hit=91
+                            ->  Index Scan using product_ingredients_position_key on product_ingredients pi  (cost=0.43..282.72 rows=12 width=14) (actual time=0.010..0.024 rows=29 loops=1)
+                                  Index Cond: (product_id = p.id)
+                                  Filter: EXISTS(SubPlan 1)
+                                  Buffers: shared hit=91
+                                  SubPlan 1
+                                    ->  Index Scan using products_pkey on products p_1  (cost=0.29..8.31 rows=1 width=0) (actual time=0.000..0.000 rows=1 loops=29)
+                                          Index Cond: (id = pi.product_id)
+                                          Filter: ((status = 'published'::product_status) AND (status = 'published'::product_status))
+                                          Buffers: shared hit=87
+  SubPlan 6
+    ->  Aggregate  (cost=2033940.16..2033940.17 rows=1 width=32) (actual time=16.724..16.725 rows=1 loops=1)
+          Buffers: shared hit=3393 read=4731
+          ->  Seq Scan on analysis_cache c  (cost=0.00..2033940.15 rows=1 width=97) (actual time=16.710..16.712 rows=2 loops=1)
+                Filter: ((NOT quarantined) AND (invalidated_at IS NULL) AND (invalidated_at IS NULL) AND (NOT quarantined) AND (product_id = p.id) AND EXISTS(SubPlan 4))
+                Rows Removed by Filter: 243340
+                Buffers: shared hit=3393 read=4731
+                SubPlan 4
+                  ->  Index Scan using products_pkey on products p_2  (cost=0.29..8.31 rows=1 width=0) (actual time=0.006..0.006 rows=1 loops=2)
+                        Index Cond: (id = c.product_id)
+                        Filter: ((status = 'published'::product_status) AND (status = 'published'::product_status))
+                        Buffers: shared hit=6
+Planning:
+  Buffers: shared hit=465
+Planning Time: 0.569 ms
+Execution Time: 17.061 ms

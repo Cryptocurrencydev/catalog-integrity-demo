@@ -1,0 +1,8 @@
+Index Scan using analysis_cache_live_key on analysis_cache  (cost=0.42..8.44 rows=1 width=79) (actual time=0.016..0.016 rows=1 loops=1)
+  Index Cond: ((product_id = 50300) AND (analysis_kind = 'safety_narrative'::text) AND (provider = 'google'::text) AND (input_hash = '9912335270602f938628aafb564c9171'::text))
+  Filter: (NOT quarantined)
+  Buffers: shared hit=7
+Planning:
+  Buffers: shared hit=189
+Planning Time: 0.290 ms
+Execution Time: 0.028 ms

@@ -1,0 +1,25 @@
+Limit  (cost=1373.69..1373.81 rows=50 width=102) (actual time=1.235..1.238 rows=50 loops=1)
+  Buffers: shared hit=1070
+  InitPlan 1
+    ->  Result  (cost=0.00..0.26 rows=1 width=1) (actual time=0.170..0.170 rows=1 loops=1)
+          Buffers: shared hit=98
+  InitPlan 2
+    ->  Result  (cost=0.00..0.26 rows=1 width=1) (never executed)
+  ->  Sort  (cost=1373.17..1373.44 rows=110 width=102) (actual time=1.235..1.236 rows=50 loops=1)
+        Sort Key: d.created_at, d.id
+        Sort Method: top-N heapsort  Memory: 36kB
+        Buffers: shared hit=1070
+        ->  Nested Loop  (cost=0.29..1369.51 rows=110 width=102) (actual time=0.180..1.194 rows=272 loops=1)
+              Buffers: shared hit=1064
+              ->  Seq Scan on repair_drafts d  (cost=0.00..162.36 rows=165 width=83) (actual time=0.175..0.399 rows=272 loops=1)
+                    Filter: ((InitPlan 1).col1 AND (status = 'pending'::draft_status))
+                    Rows Removed by Filter: 717
+                    Buffers: shared hit=248
+              ->  Index Scan using products_pkey on products p  (cost=0.29..7.32 rows=1 width=35) (actual time=0.003..0.003 rows=1 loops=272)
+                    Index Cond: (id = d.product_id)
+                    Filter: ((status = 'published'::product_status) OR (InitPlan 2).col1)
+                    Buffers: shared hit=816
+Planning:
+  Buffers: shared hit=241
+Planning Time: 0.325 ms
+Execution Time: 1.262 ms

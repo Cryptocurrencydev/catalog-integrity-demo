@@ -1,0 +1,40 @@
+Limit  (cost=1.53..201.45 rows=50 width=99) (actual time=0.212..0.581 rows=50 loops=1)
+  Buffers: shared hit=432
+  InitPlan 1
+    ->  Result  (cost=0.00..0.26 rows=1 width=1) (actual time=0.189..0.190 rows=1 loops=1)
+          Buffers: shared hit=98
+  InitPlan 2
+    ->  Result  (cost=0.00..0.26 rows=1 width=1) (never executed)
+  ->  Nested Loop Left Join  (cost=1.01..13400.19 rows=3351 width=99) (actual time=0.211..0.579 rows=50 loops=1)
+        Buffers: shared hit=432
+        ->  Nested Loop Left Join  (cost=0.72..13306.80 rows=3351 width=86) (actual time=0.206..0.541 rows=50 loops=1)
+              Buffers: shared hit=366
+              ->  Nested Loop Left Join  (cost=0.57..13216.32 rows=3351 width=84) (actual time=0.203..0.514 rows=50 loops=1)
+                    Buffers: shared hit=300
+                    ->  Index Scan using verification_queue_pending on verification_queue q  (cost=0.28..2289.51 rows=3351 width=57) (actual time=0.197..0.295 rows=50 loops=1)
+                          Filter: (InitPlan 1).col1
+                          Buffers: shared hit=150
+                    ->  Index Scan using products_pkey on products p  (cost=0.29..3.26 rows=1 width=43) (actual time=0.004..0.004 rows=1 loops=50)
+                          Index Cond: (id = q.product_id)
+                          Filter: ((status = 'published'::product_status) OR (InitPlan 2).col1)
+                          Buffers: shared hit=150
+              ->  Memoize  (cost=0.15..0.17 rows=1 width=18) (actual time=0.000..0.000 rows=1 loops=50)
+                    Cache Key: p.brand_id
+                    Cache Mode: logical
+                    Hits: 17  Misses: 33  Evictions: 0  Overflows: 0  Memory Usage: 5kB
+                    Buffers: shared hit=66
+                    ->  Index Scan using brands_pkey on brands b  (cost=0.14..0.16 rows=1 width=18) (actual time=0.000..0.000 rows=1 loops=33)
+                          Index Cond: (id = p.brand_id)
+                          Buffers: shared hit=66
+        ->  Memoize  (cost=0.29..0.34 rows=1 width=29) (actual time=0.001..0.001 rows=1 loops=50)
+              Cache Key: q.suggested_ingredient_id
+              Cache Mode: logical
+              Hits: 28  Misses: 22  Evictions: 0  Overflows: 0  Memory Usage: 3kB
+              Buffers: shared hit=66
+              ->  Index Scan using ingredients_pkey on ingredients s  (cost=0.28..0.33 rows=1 width=29) (actual time=0.001..0.001 rows=1 loops=22)
+                    Index Cond: (id = q.suggested_ingredient_id)
+                    Buffers: shared hit=66
+Planning:
+  Buffers: shared hit=521
+Planning Time: 0.688 ms
+Execution Time: 0.619 ms

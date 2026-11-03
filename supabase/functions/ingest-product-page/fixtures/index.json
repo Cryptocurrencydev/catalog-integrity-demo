@@ -1,0 +1,18 @@
+{
+  "https://velvane-skin.example/products/hydrating-facial-cleanser": { "file": "velvane-hydrating-cleanser.html" },
+  "https://northfern.example/p/niacinamide-10-serum": { "file": "northfern-niacinamide-serum.html" },
+  "https://ondessa-hair.example/shop/repair-conditioner": { "file": "ondessa-repair-conditioner.html" },
+  "https://saltglass.example/products/mineral-sunscreen-spf-30": { "file": "saltglass-mineral-sunscreen.html" },
+  "https://dermadeals.example/item/velvane-hydrating-cleanser-150ml": { "file": "dermadeals-velvane-cleanser.html" },
+  "https://petalwright.example/products/lip-conditioning-balm": {
+    "file": "petalwright-lip-balm.html",
+    "failTimes": 2,
+    "failStatus": 503
+  },
+  "https://petalwright.example/products/overnight-lip-mask": {
+    "file": "petalwright-lip-balm.html",
+    "failTimes": 99,
+    "failStatus": 503
+  },
+  "https://halcyra.example/products/calm-barrier-cream": { "file": "halcyra-broken-page.html" }
+}

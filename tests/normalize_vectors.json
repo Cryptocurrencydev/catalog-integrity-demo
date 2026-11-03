@@ -1,0 +1,82 @@
+[
+  {
+    "input": "Aqua/Water/Eau",
+    "expected": "aqua/water/eau"
+  },
+  {
+    "input": "  Glycerin*  ",
+    "expected": "glycerin"
+  },
+  {
+    "input": "Sodium Lauryl Sulphate",
+    "expected": "sodium lauryl sulfate"
+  },
+  {
+    "input": "1, 2-Hexanediol",
+    "expected": "1,2-hexanediol"
+  },
+  {
+    "input": "Caprylic / Capric Triglyceride",
+    "expected": "caprylic/capric triglyceride"
+  },
+  {
+    "input": "Coco – Glucoside",
+    "expected": "coco-glucoside"
+  },
+  {
+    "input": "Tocopherol (Vitamin E).",
+    "expected": "tocopherol (vitamin e)"
+  },
+  {
+    "input": "CRÈME DE RIZ",
+    "expected": "creme de riz"
+  },
+  {
+    "input": "crème de riz",
+    "expected": "creme de riz"
+  },
+  {
+    "input": "Parfum†",
+    "expected": "parfum"
+  },
+  {
+    "input": "Phenoxyethanol;",
+    "expected": "phenoxyethanol"
+  },
+  {
+    "input": "Zinc Oxide",
+    "expected": "zinc oxide"
+  },
+  {
+    "input": "Zinc Oxide [Nano]",
+    "expected": "zinc oxide [nano]"
+  },
+  {
+    "input": "   ",
+    "expected": null
+  },
+  {
+    "input": "Avena Sativa (Oat) Kernel Flour¹",
+    "expected": "avena sativa (oat) kernel flour"
+  },
+  {
+    "input": "Hexyl \t Cinnamal",
+    "expected": "hexyl cinnamal"
+  },
+  {
+    "input": "Rosa Canina Fruit Oil’s",
+    "expected": "rosa canina fruit oil's"
+  },
+  {
+    "input": "PEG-100  Stearate",
+    "expected": "peg-100 stearate"
+  },
+  {
+    "input": "  ...Limonene.  ",
+    "expected": "limonene"
+  },
+  {
+    "input": "Ceteareth‑20",
+    "expected": "ceteareth-20"
+  }
+]
